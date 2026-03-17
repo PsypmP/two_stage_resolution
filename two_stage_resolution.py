@@ -20,9 +20,9 @@ class TwoStageResolution:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "width":      ("INT",   {"default": 1920, "min": 64, "max": 8192, "step": 1}),
-                "height":     ("INT",   {"default": 1080, "min": 64, "max": 8192, "step": 1}),
-                "multiplier": (["1.5", "2"],),
+                "width":           ("INT", {"default": 1920, "min": 64, "max": 8192, "step": 1}),
+                "height":          ("INT", {"default": 1080, "min": 64, "max": 8192, "step": 1}),
+                "spatial_upscaler": (["none", "1.5", "2"],),
             }
         }
 
@@ -31,9 +31,16 @@ class TwoStageResolution:
     FUNCTION      = "calculate"
     CATEGORY      = "video/resolution"
 
-    def calculate(self, width: int, height: int, multiplier: str):
-        frac = Fraction(multiplier).limit_denominator(10)
-        step = get_step(float(multiplier))
+    def calculate(self, width: int, height: int, spatial_upscaler: str):
+        # none = одноэтапная генерация, просто выравниваем до кратного 32
+        if spatial_upscaler == "none":
+            w1 = round_up_to(width,  32)
+            h1 = round_up_to(height, 32)
+            info = f"BASE: {w1} × {h1}\nFACT: — (no upscale)"
+            return (w1, h1, info)
+
+        frac = Fraction(spatial_upscaler).limit_denominator(10)
+        step = get_step(float(spatial_upscaler))
 
         w2 = round_up_to(width,  step)
         h2 = round_up_to(height, step)
