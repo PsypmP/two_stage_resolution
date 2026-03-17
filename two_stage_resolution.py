@@ -47,9 +47,11 @@ class TwoStageResolution:
         h1 = h2 * frac.denominator // frac.numerator
 
         label = f"Base: {w1} × {h1}\nFinal: {w2} × {h2}"
-        print(f"[TwoStageResolution] {label}")
 
-        return (w1, h1)
+        return {
+            "ui": {"text": [label]},
+            "result": (w1, h1)
+        }
 
 
 NODE_CLASS_MAPPINGS = {
